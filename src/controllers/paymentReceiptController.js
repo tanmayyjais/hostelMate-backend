@@ -26,8 +26,7 @@ const uploadReceipt = asyncHandler(async (req, res) => {
     }
  
     // ✅ Ensure file is received
-    const receiptFile = req.files?.receipt?.[0]; // If using `multer().fields()`
-    if (!receiptFile) {
+    if (!req.file) {
        return res.status(400).json({ error: "Receipt file is required!" });
     }
  
@@ -40,7 +39,7 @@ const uploadReceipt = asyncHandler(async (req, res) => {
        id_number,
        amount,
        challan_number,
-       receipt: `/uploads/${receiptFile.filename}`, // Store the uploaded file path
+       receipt: req.file.location, // Store the uploaded file path
     });
  
     const createdReceipt = await newReceipt.save();
