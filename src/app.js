@@ -10,7 +10,7 @@ import cors from "cors";
 import roomRouter from "./routes/roomsRoutes.js";
 import { paymentReceiptRouter } from "./routes/paymentReceiptRoutes.js";
 import { gatePassRouter } from "./routes/gatePassRoutes.js"; // ✅ Import the new Gate Pass Router
-
+import statsRoutes from "./routes/statsRoutes.js";
 
 dotenv.config();
 
@@ -39,6 +39,7 @@ app.use("/api/announcements", announcementRouter);
 app.use("/api/rooms", roomRouter);
 app.use("/api/payment-receipts", paymentReceiptRouter);
 app.use("/api/gate-pass", gatePassRouter); // ✅ New Route for Gate Passes
+app.use("/api/stats", statsRoutes);
 
 
 app.listen(PORT, () => {

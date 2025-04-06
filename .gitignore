@@ -1,4 +1,7 @@
 # backend
 node_modules
 src/.env
-
+*.pkl
+*.csv
+/uploads
+*.safetensors

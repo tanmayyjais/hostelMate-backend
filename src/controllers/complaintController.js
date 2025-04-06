@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import { Complaint } from "../models/complaintModel.js";
 import multer from "multer";
 import path from "path";
+import axios from "axios";
 
 // Set up Multer storage
 const storage = multer.diskStorage({
@@ -52,9 +53,9 @@ const getUserComplaints = asyncHandler(async (req, res) => {
 // @route   POST /api/complaints
 // @access  User
 const createComplaint = asyncHandler(async (req, res) => {
-   const { title, description } = req.body;
+   const { title, description, category } = req.body;
 
-   if (!title || !description) {
+   if (!title || !description || !category) {
       res.status(400);
       throw new Error("Please add all required fields");
    }
@@ -64,11 +65,28 @@ const createComplaint = asyncHandler(async (req, res) => {
       imageUrl = `/uploads/${req.file.filename}`;
    }
 
+   // Call sentiment analysis microservice
+   let sentiment = "neutral";
+   let sentiment_score = 0.5;
+
+   try {
+      const sentimentRes = await axios.post("http://127.0.0.1:8000/analyze", {
+         text: `${description}`,
+      });
+      sentiment = sentimentRes.data.sentiment;
+      sentiment_score = sentimentRes.data.confidence;
+   } catch (error) {
+      console.log("Sentiment service failed:", error.message);
+   }
+
    const complaint = new Complaint({
       user: req.user._id,
       title,
       description,
-      image: imageUrl, // ✅ Store only the filename, not the full path
+      image: imageUrl,
+      category,
+      sentiment,
+      sentiment_score,
    });
 
    const createdComplaint = await complaint.save();
