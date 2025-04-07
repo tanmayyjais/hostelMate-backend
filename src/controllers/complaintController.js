@@ -148,6 +148,39 @@ const getComplaintsByStatus = asyncHandler(async (req, res) => {
    res.status(200).json(complaints);
 });
 
+// Fetch recent complaints for today only (2 latest)
+const getTodayComplaints = asyncHandler(async (req, res) => {
+   const today = new Date();
+   today.setHours(0, 0, 0, 0);
+   const tomorrow = new Date(today);
+   tomorrow.setDate(today.getDate() + 1);
+
+   const complaints = await Complaint.find({
+      category: req.user.department,
+      createdAt: { $gte: today, $lt: tomorrow }
+   })
+   .populate("user", "full_name email")
+   .sort({ createdAt: -1 })
+   .limit(2);
+
+   res.status(200).json(complaints);
+});
+
+// Fetch complaint counts by department
+const getComplaintStats = asyncHandler(async (req, res) => {
+   const department = req.user.department;
+   const all = await Complaint.find({ category: department });
+
+   const stats = {
+      total: all.length,
+      resolved: all.filter(c => c.status === "resolved").length,
+      pending: all.filter(c => c.status === "pending").length,
+   };
+
+   res.json(stats);
+});
+
+
 export { 
    getAllComplaints, 
    getUserComplaints, 
@@ -155,5 +188,7 @@ export {
    updateComplaintStatus, 
    upload,
    getDepartmentComplaints, // ✅ Add this!
-   getComplaintsByStatus
+   getComplaintsByStatus,
+   getTodayComplaints, 
+   getComplaintStats
 };
