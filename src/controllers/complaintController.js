@@ -102,7 +102,10 @@ const getDepartmentComplaints = asyncHandler(async (req, res) => {
       throw new Error("Department not found in user profile!");
    }
 
-   const complaints = await Complaint.find({ department: userDept }).populate("user", "full_name email").sort({ createdAt: -1 });
+   const complaints = await Complaint.find({ category: userDept })
+      .populate("user", "full_name email mobile_no")
+      .sort({ createdAt: -1 });
+
    res.status(200).json(complaints);
 });
 

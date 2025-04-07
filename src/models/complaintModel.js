@@ -11,7 +11,11 @@ const complaintSchema = mongoose.Schema(
       enum: ["pending", "accepted", "resolved"],
       default: "pending",
     },
-    category: { type: String, required: true }, // electrical, plumber, etc
+    category: {
+      type: String,
+      enum: ["electrical", "water", "maintenance", "security"],
+      required: true,
+   },
     sentiment: {
       type: String,
       enum: ["very_negative", "negative", "neutral", "positive", "very_positive"],
@@ -21,6 +25,7 @@ const complaintSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
 
 const Complaint = mongoose.model("Complaint", complaintSchema);
 export { Complaint };

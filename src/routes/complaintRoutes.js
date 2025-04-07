@@ -5,26 +5,26 @@ import {
    createComplaint,
    updateComplaintStatus,
    upload,
-   getDepartmentComplaints // ✅ Add this line
+   getDepartmentComplaints
 } from "../controllers/complaintController.js";
 
-import { protect, admin } from "../middlewares/authMiddleware.js";
+import { protect, admin, departmentAccess } from "../middlewares/authMiddleware.js";
 
 const complaintRouter = express.Router();
 
 // Admin - Get all complaints
 complaintRouter.route("/").get(protect, admin, getAllComplaints);
 
-// User - Get complaints for a specific user
+// User - Get complaints for themselves
 complaintRouter.route("/user").get(protect, getUserComplaints);
 
-// User - Add a new complaint (supports image upload)
+// User - Add new complaint with optional image
 complaintRouter.route("/").post(protect, upload.single("image"), createComplaint);
 
-// Admin - Update complaint status
-complaintRouter.route("/:id/status").patch(protect, admin, updateComplaintStatus);
+// Staff/Admin - Get complaints for their department
+complaintRouter.route("/department").get(protect, departmentAccess, getDepartmentComplaints);
 
-// Staff - Get complaints by department
-complaintRouter.route("/department").get(protect, getDepartmentComplaints); // ✅ Now works
+// Staff/Admin - Update complaint status
+complaintRouter.route("/:id/status").patch(protect, departmentAccess, updateComplaintStatus);
 
 export { complaintRouter };
