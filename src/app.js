@@ -3,7 +3,6 @@ import { connectDb } from "./config/dbConfig.js";
 import { authRouter as authRoutes } from "./routes/authRoutes.js";
 import { complaintRouter as complaintRoutes } from "./routes/complaintRoutes.js";
 import { announcementRouter } from "./routes/announcementRoutes.js";
-import roomRouter from "./routes/roomsRoutes.js";
 import { paymentReceiptRouter } from "./routes/paymentReceiptRoutes.js";
 import { gatePassRouter } from "./routes/gatePassRoutes.js";
 import dotenv from "dotenv";
@@ -11,8 +10,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import roomRouter from "./routes/roomsRoutes.js";
-import { paymentReceiptRouter } from "./routes/paymentReceiptRoutes.js";
-import { gatePassRouter } from "./routes/gatePassRoutes.js"; // ✅ Import the new Gate Pass Router
 import statsRoutes from "./routes/statsRoutes.js";
 
 dotenv.config();
@@ -21,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 5003;
+const PORT = process.env.PORT || 5000;
 
 // Connect Database
 connectDb();
