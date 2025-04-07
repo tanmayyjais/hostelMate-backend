@@ -1,7 +1,15 @@
 import mongoose from "mongoose";
 
-// ✅ Enum for user roles
-const MEMBER_TYPE_ENUM = ["student", "academicStaff"];
+const MEMBER_TYPE_ENUM = [
+   "student",
+   "academicStaff",       // Super Admin
+   "electricalStaff",
+   "waterStaff",
+   "maintenanceStaff",
+   "securityStaff",
+];
+
+const DEPARTMENT_ENUM = ["electrical", "water", "maintenance", "security"];
 
 const userSchema = mongoose.Schema(
    {
@@ -20,9 +28,14 @@ const userSchema = mongoose.Schema(
       },
       member_type: {
          type: String,
-         enum: MEMBER_TYPE_ENUM, // ✅ Restrict member type to valid values
+         enum: MEMBER_TYPE_ENUM,
          required: true,
          default: "student",
+      },
+      department: {
+         type: String,
+         enum: DEPARTMENT_ENUM,
+         default: null,
       },
       mobile_no: {
          type: String,
@@ -33,21 +46,25 @@ const userSchema = mongoose.Schema(
          required: [true, "Gender is required!"],
       },
       enrollment_no: {
-         type: String, // Stores enrollment number
-         required: [true, "Enrollment number is required!"],
+         type: String,
+         required: function () {
+           return this.member_type === "student";
+         },
          unique: true,
-      },
-      id_number: {
-         type: String, // Stores unique ID number (e.g., student/staff ID)
-         required: [true, "ID number is required!"],
+       },
+       id_number: {
+         type: String,
+         required: function () {
+           return this.member_type === "student";
+         },
          unique: true,
-      },
+       },       
       hostel_no: {
-         type: String, // Stores hostel number
+         type: String,
          default: null,
       },
       room_no: {
-         type: Number, // Stores room number (should be a number, not string)
+         type: Number,
          default: null,
       },
    },

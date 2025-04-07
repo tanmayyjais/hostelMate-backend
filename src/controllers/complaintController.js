@@ -87,10 +87,23 @@ const createComplaint = asyncHandler(async (req, res) => {
       category,
       sentiment,
       sentiment_score,
+      department: req.user.department || null, // Attach department from the user object
    });
 
    const createdComplaint = await complaint.save();
    res.status(201).json(createdComplaint);
+});
+
+const getDepartmentComplaints = asyncHandler(async (req, res) => {
+   const userDept = req.user.department;
+
+   if (!userDept) {
+      res.status(400);
+      throw new Error("Department not found in user profile!");
+   }
+
+   const complaints = await Complaint.find({ department: userDept }).populate("user", "full_name email").sort({ createdAt: -1 });
+   res.status(200).json(complaints);
 });
 
 // @desc    Update complaint status
@@ -116,4 +129,11 @@ const updateComplaintStatus = asyncHandler(async (req, res) => {
    res.json(updatedComplaint);
 });
 
-export { getAllComplaints, getUserComplaints, createComplaint, updateComplaintStatus, upload };
+export { 
+   getAllComplaints, 
+   getUserComplaints, 
+   createComplaint, 
+   updateComplaintStatus, 
+   upload,
+   getDepartmentComplaints // ✅ Add this!
+};

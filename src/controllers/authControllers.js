@@ -19,48 +19,71 @@ const userRegister = asyncHandler(async (req, res) => {
       gender,
       enrollment_no,
       id_number,
+      department,
    } = req.body;
 
-   if (!email || !password || !mobile_no || !enrollment_no || !id_number) {
+   console.log("📝 Register attempt for:", email);
+
+   // Basic required fields
+   if (!email || !password || !mobile_no || !gender || !member_type || !full_name) {
       res.status(400);
       throw new Error("All required fields must be provided!");
    }
 
-   // ✅ Validate member type (Only allowed values)
-   const validMemberTypes = ["student", "academicStaff"];
+   // Check student-specific required fields
+   if (member_type === "student") {
+      if (!enrollment_no || !id_number) {
+         res.status(400);
+         throw new Error("Enrollment number and ID number are required for students!");
+      }
+   }
+
+   // Validate member type (can be expanded as needed)
+   const validMemberTypes = [
+      "student",
+      "academicStaff",
+      "electricalStaff",
+      "waterStaff",
+      "maintenanceStaff",
+      "securityStaff",
+   ];
    if (!validMemberTypes.includes(member_type)) {
       res.status(400);
       throw new Error("Invalid member type!");
    }
 
-   // ✅ Check for duplicate email, enrollment_no, or id_number
-   const userExists = await User.findOne({ 
-      $or: [{ email }, { enrollment_no }, { id_number }] 
-   }).exec();
+   // Check if user already exists
+   const conditions = [
+      { email },
+      ...(enrollment_no ? [{ enrollment_no }] : []),
+      ...(id_number ? [{ id_number }] : []),
+   ];
+
+   const userExists = await User.findOne({ $or: conditions }).exec();
 
    if (userExists) {
       res.status(400);
       throw new Error("User with this email, enrollment number, or ID number already exists!");
    }
 
-   // ✅ Hash the password
    const hashedPassword = await bcrypt.hash(password, 10);
 
-   // ✅ Create new user
    const user = await User.create({
       full_name,
       email,
       password: hashedPassword,
       member_type,
+      department: department || null,
       mobile_no,
       gender,
-      enrollment_no,
-      id_number,
+      enrollment_no: member_type === "student" ? enrollment_no : null,
+      id_number: member_type === "student" ? id_number : null,
       hostel_no: null,
       room_no: null,
    });
 
    if (user) {
+      console.log("✅ User registered successfully:", user.email);
       res.status(201).json({
          u_id: user._id,
          full_name: user.full_name,
@@ -82,20 +105,24 @@ const userRegister = asyncHandler(async (req, res) => {
 const userLogin = asyncHandler(async (req, res) => {
    const { email, password } = req.body;
 
+   console.log("➡️ Login attempt from:", email);
+
    const existUser = await User.findOne({ email }).exec();
    if (!existUser) {
+      console.warn("❌ Login failed: user not found:", email);
       res.status(400);
       throw new Error("User does not exist with the given email!");
    }
 
-   // ✅ Compare the hashed password
    const isPasswordCorrect = await bcrypt.compare(password, existUser.password);
    if (!isPasswordCorrect) {
+      console.warn("❌ Login failed: incorrect password for", email);
       res.status(400);
       throw new Error("Incorrect password!");
    }
 
    const accessToken = generateToken(existUser._id, existUser.member_type);
+   console.log("✅ Login success for:", email);
 
    res.status(200).json({
       token: `Bearer ${accessToken}`,
