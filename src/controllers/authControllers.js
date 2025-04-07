@@ -94,6 +94,7 @@ const userRegister = asyncHandler(async (req, res) => {
          hostel_no: user.hostel_no,
          room_no: user.room_no,
          member_type: user.member_type,
+         department: user.department,
       });
    } else {
       res.status(400);
@@ -136,6 +137,7 @@ const userLogin = asyncHandler(async (req, res) => {
          id_number: existUser.id_number,
          hostel_no: existUser.hostel_no,
          room_no: existUser.room_no,
+         department: existUser.department,
       },
    });
 });
