@@ -131,6 +131,22 @@ const updateComplaintStatus = asyncHandler(async (req, res) => {
 
    res.json(updatedComplaint);
 });
+// Filter by status and department
+const getComplaintsByStatus = asyncHandler(async (req, res) => {
+   const userDept = req.user.department;
+   const { status } = req.query;
+
+   if (!status) {
+      res.status(400);
+      throw new Error("Status is required");
+   }
+
+   const complaints = await Complaint.find({ category: userDept, status })
+      .populate("user", "full_name email")
+      .sort({ createdAt: -1 });
+
+   res.status(200).json(complaints);
+});
 
 export { 
    getAllComplaints, 
@@ -138,5 +154,6 @@ export {
    createComplaint, 
    updateComplaintStatus, 
    upload,
-   getDepartmentComplaints // ✅ Add this!
+   getDepartmentComplaints, // ✅ Add this!
+   getComplaintsByStatus
 };

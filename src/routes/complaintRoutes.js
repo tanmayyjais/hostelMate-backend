@@ -9,6 +9,7 @@ import {
 } from "../controllers/complaintController.js";
 
 import { protect, admin, departmentAccess } from "../middlewares/authMiddleware.js";
+import { getComplaintsByStatus } from "../controllers/complaintController.js";
 
 const complaintRouter = express.Router();
 
@@ -26,5 +27,6 @@ complaintRouter.route("/department").get(protect, departmentAccess, getDepartmen
 
 // Staff/Admin - Update complaint status
 complaintRouter.route("/:id/status").patch(protect, departmentAccess, updateComplaintStatus);
+complaintRouter.route("/status").get(protect, departmentAccess, getComplaintsByStatus);
 
 export { complaintRouter };
