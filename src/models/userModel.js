@@ -9,7 +9,7 @@ const MEMBER_TYPE_ENUM = [
    "securityStaff",
 ];
 
-const DEPARTMENT_ENUM = ["electrical", "water", "maintenance", "security"];
+const DEPARTMENT_ENUM = ["electrical", "water", "maintenance", "security", "houskeeping", "network"];
 
 const userSchema = mongoose.Schema(
    {
