@@ -1,5 +1,13 @@
 import express from "express";
-import { getAllComplaints, getUserComplaints, createComplaint, updateComplaintStatus ,upload } from "../controllers/complaintController.js";
+import {
+   getAllComplaints,
+   getUserComplaints,
+   createComplaint,
+   updateComplaintStatus,
+   upload,
+   getDepartmentComplaints // ✅ Add this line
+} from "../controllers/complaintController.js";
+
 import { protect, admin } from "../middlewares/authMiddleware.js";
 
 const complaintRouter = express.Router();
@@ -16,5 +24,7 @@ complaintRouter.route("/").post(protect, upload.single("image"), createComplaint
 // Admin - Update complaint status
 complaintRouter.route("/:id/status").patch(protect, admin, updateComplaintStatus);
 
+// Staff - Get complaints by department
+complaintRouter.route("/department").get(protect, getDepartmentComplaints); // ✅ Now works
 
 export { complaintRouter };
